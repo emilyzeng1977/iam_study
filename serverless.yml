@@ -1,13 +1,13 @@
 service: iam
 
-frameworkVersion: "3.15.2"
+frameworkVersion: "3.10"
 
 useDotenv: true
 
 plugins:
   - serverless-iam-roles-per-function
   - serverless-step-functions
-
+    
 provider:
   name: aws
   runtime: go1.x
@@ -27,7 +27,7 @@ provider:
     SSM_ARN: arn:aws:ssm:${aws:region}:${aws:accountId}:parameter/${env:SLS_STAGE}/*
     KINESIS_ARN: arn:aws:kinesis:${aws:region}:${aws:accountId}:stream/eventstream
     REDIS_ENDPOINT: ${env:REDIS_ENDPOINT}
-
+      
 package:
   patterns:
     - "!./**"
@@ -101,7 +101,7 @@ functions:
           enabled: true
           filterPatterns:
             - data:
-                type:
+                type: 
                   - "identitii.iam.customer.v1alpha1.Created"
                   - "identitii.iam.customer.v1alpha1.Updated"
   jwks-refresher:
@@ -116,16 +116,16 @@ functions:
         Resource:
           - "*"
 
-
+            
 
 #
 # Customer workflow section
-# TODO: Terraform this.
-#
+# TODO: Terraform this. 
+# 
 stepFunctions:
   stateMachines:
     NewCustomerProvisioningFlow:
-      role: arn:aws:iam::${aws:accountId}:role/NewCustomerProvisioningFlowRole
+      role: arn:aws:iam::${aws:accountId}:role/NewCustomerProvisioningFlowRole    
       events:
         - http:
             method: POST

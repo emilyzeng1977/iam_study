@@ -1,0 +1,18 @@
+deploy-dev:
+  stage: deploy
+  extends: .go-cache
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+  dependencies:
+    - build
+  script:
+    - cp ./env/dev.env .env
+    - env $(cat .env | grep -v "^#" | xargs) serverless plugin install -n serverless-iam-roles-per-function
+    - env $(cat .env | grep -v "^#" | xargs) serverless plugin install -n serverless-step-functions
+    - serverless config credentials --provider aws --key $AWS_ACCESS_KEY_ID --secret $AWS_SECRET_ACCESS_KEY
+    - env $(cat .env | grep -v "^#" | xargs) make deploy
+  allow_failure: true # TODO:Remove this when we get aws runners sorted
+  cache:
+    key: "build-cache:$CI_COMMIT_SHORT_SHA"
+    paths:
+      - dist/
