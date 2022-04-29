@@ -1,0 +1,48 @@
+project_name: iam
+before:
+  hooks:
+    - go generate ./...
+builds:
+  - id: authorizer
+    main: ./lambda/authorizer/authorizer.go
+    binary: authorizer
+    env:
+      - CGO_ENABLED=0
+    goarch:
+      - amd64
+  - id: create-customer
+    main: ./workflow/customer-onboarding/create-customer/main.go
+    binary: create-customer
+    env:
+      - CGO_ENABLED=0
+    goarch:
+      - amd64
+  - id: customer-projector
+    main: ./lambda/customer-projector/customer-projector.go
+    binary: customer-projector
+    env:
+      - CGO_ENABLED=0
+    goarch:
+      - amd64
+  - id: jwks-refresher
+    main: ./lambda/jwks-refresher/jwks-refresher.go
+    binary: jwks-refresher
+    env:
+      - CGO_ENABLED=0
+    goarch:
+      - amd64
+  - id: seeder
+    main: ./lambda/seeder/seeder.go
+    binary: seeder
+    env:
+      - CGO_ENABLED=0
+    goarch:
+      - amd64
+
+  # - id: customerapi
+  #   main: ./lambda/customerapi/customerapi.go
+  #   binary: customerapi
+  #   env:
+  #     - CGO_ENABLED=0
+  #   goarch:
+  #     - amd64
