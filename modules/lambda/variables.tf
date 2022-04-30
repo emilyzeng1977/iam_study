@@ -96,6 +96,11 @@ variable "managed_policy_arns" {
   type        = list(string)
 }
 
+variable "policy_statements" {
+  description = "Map of dynamic policy statements to attach to Lambda Function role"
+  type        = map
+  default     = {}
+}
 
 variable "tags" {
   description = "Tags to apply to the keys."
@@ -114,6 +119,7 @@ locals {
 
   SSM_ARN      = format("arn:aws:ssm:%s:%s:parameter/%s/*", var.aws_region, var.account_id, var.stage)
   # IAM
+  lambda_role_name = format("%s-%s-%s-%s-lambdaRole", var.service, var.stage, var.handler, var.aws_region)
   inline_policy_name = format("%s-%s-%s", var.service, var.stage, var.handler)
   inline_policy_tpl_filename = format("template/%s.tpl", var.handler)
 
