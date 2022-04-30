@@ -1,13 +1,12 @@
 service: iam
 
-frameworkVersion: "3.10"
+frameworkVersion: "3.16.0"
 
 useDotenv: true
 
 plugins:
   - serverless-iam-roles-per-function
   - serverless-step-functions
-    
 provider:
   name: aws
   runtime: go1.x
@@ -19,14 +18,14 @@ provider:
     subnetIds:
       - ${env:VPC_SUBNET_ID}
 
-  # Important environment variables for lambda to know context/region
+  # Important environment variables foraw lambda to know context/region
   environment:
     ENV_STAGE: ${self:provider.stage}
     ENV_REGION: ${self:provider.region}
     EVENT_TABLE_NAME: events
     SSM_ARN: arn:aws:ssm:${aws:region}:${aws:accountId}:parameter/${env:SLS_STAGE}/*
     KINESIS_ARN: arn:aws:kinesis:${aws:region}:${aws:accountId}:stream/eventstream
-    REDIS_ENDPOINT: ${env:REDIS_ENDPOINT}
+    # REDIS_ENDPOINT: ${env:REDIS_ENDPOINT}
       
 package:
   patterns:
@@ -93,7 +92,8 @@ functions:
     events:
       - stream:
           type: kinesis
-          arn: ${self:provider.environment.KINESIS_ARN}
+          # arn: ${self:provider.environment.KINESIS_ARN}
+          arn: "arn:aws:kinesis:ap-southeast-2:204532658794:stream/kinesis_demo"
           batchSize: 100
           startingPosition: TRIM_HORIZON
           maximumRetryAttempts: 5
@@ -125,7 +125,7 @@ functions:
 stepFunctions:
   stateMachines:
     NewCustomerProvisioningFlow:
-      role: arn:aws:iam::${aws:accountId}:role/NewCustomerProvisioningFlowRole    
+      role: arn:aws:iam::${aws:accountId}:role/NewCustomerProvisioningFlowRole
       events:
         - http:
             method: POST

@@ -27,9 +27,13 @@ data "template_file" "iam-policy-template" {
   template = file(local.inline_policy_tpl_filename)
 
   vars = {
-    aws_region    = var.aws_region
-    account_id    = var.account_id
-    stage         = var.stage
-    function_name = local.function_name
+    aws_region = var.aws_region
+    account_id = var.account_id
+    service    = var.service
+    stage      = var.stage
+    handler    = var.handler
+
+    dynamo_kms_key_val  = var.dynamo_kms_key_val
+    kinesis_kms_key_val = var.kinesis_kms_key_val
   }
 }

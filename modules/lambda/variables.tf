@@ -78,7 +78,16 @@ variable "dist_path" {
 }
 
 variable "kms_key_val" {
-  description = "The last kms key value like (834f524e-b2c2-4146-b98d-be77e976483c)"
+
+}
+
+variable "dynamo_kms_key_val" {
+  description = "The last kms key value like (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)"
+  type        = string
+}
+
+variable "kinesis_kms_key_val" {
+  description = "The last kms key value like (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)"
   type        = string
 }
 
@@ -107,7 +116,6 @@ locals {
   # IAM
   inline_policy_name = format("%s-%s-%s", var.service, var.stage, var.handler)
   inline_policy_tpl_filename = format("template/%s.tpl", var.handler)
-  lambda_role_name   = var.handler == "create-customer" ? format("%s-%s-%s-lambdaRole", var.service, var.stage, var.aws_region) : format("%s-%s-%s-%s-lambdaRole", var.service, var.stage, var.handler, var.aws_region)
 
   KMS_KEY = format("arn:aws:kms:%s:%s:key/%s", var.aws_region, var.account_id, var.kms_key_val)
   # Otel
