@@ -3,7 +3,8 @@ module "step_function" {
   version = "2.7.0"
 
   name       = local.step_function_name
-  definition = data.template_file.new-customer-defination.rendered
+#  definition = data.template_file.new-customer-defination.rendered
+  definition = var.definition
 
   use_existing_role = true
   role_arn = data.aws_iam_role.NewCustomerProvisioningFlowRole.arn

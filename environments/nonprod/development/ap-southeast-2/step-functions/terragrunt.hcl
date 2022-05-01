@@ -21,6 +21,8 @@ inputs = {
   stage   = local.env_vars.locals.SLS_STAGE
   account_id = local.account_vars.locals.aws_account_id
 
+  definition = templatefile("../../../../../workflow/customer-onboarding/create-customer/definition.tpl", {})
+
   tags = {
     "Managed By" = "Terragrunt"
   }

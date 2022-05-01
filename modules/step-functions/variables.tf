@@ -4,13 +4,13 @@ variable "account_id" {
 }
 
 variable "service" {
-  description = "Service name for your Lambda"
+  description = "Service name for your Step function"
   type        = string
   default     = ""
 }
 
 variable "stage" {
-  description = "Stage for your Lambda"
+  description = "Stage for your Step function"
   type        = string
 }
 
@@ -25,13 +25,18 @@ variable "random_id" {
 }
 
 variable "handler" {
-  description = "A handler name for your Lambda"
+  description = "A handler name for your Step function"
   type        = string
   default     = ""
 }
 
 variable "aws_region" {
-  description = "AWS region for your Lambda"
+  description = "AWS region for your Step function"
+  type        = string
+}
+
+variable "definition" {
+  description = "AWS region for your Step function"
   type        = string
 }
 
