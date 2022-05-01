@@ -34,6 +34,9 @@ module "lambda" {
 
   environment_variables = local.environment_variables
 
+  ###################
+  # role and policies
+  ###################
   create_role = true
   role_name = local.lambda_role_name
 
@@ -41,20 +44,19 @@ module "lambda" {
   number_of_policies = var.number_of_policies
   policies = var.policies
 
-  # inline policies
   attach_policy_statements = var.attach_policy_statements
   policy_statements = local.policy_statements
 
+  ###########
+  # honeycomb
+  ###########
   layers = compact([local.sdk_layer_arns_amd64])
   tracing_mode = var.tracing_mode
 
+  ###########
+  # Event
+  ###########
+  event_source_mapping = var.event_source_mapping
+
   tags = var.tags
-
-#  depends_on = [aws_iam_role.iam_lambda_access_role]
 }
-
-#resource "aws_lambda_event_source_mapping" "example" {
-#  event_source_arn  = "arn:aws:kinesis:ap-southeast-2:575625010278:stream/kinesis_demo"
-#  function_name     = module.lambda[0].lambda_function_name
-#  starting_position = "LATEST"
-#}

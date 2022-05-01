@@ -24,6 +24,15 @@ variable "aws_region" {
   type        = string
 }
 
+variable "tags" {
+  description = "Tags to apply to the keys."
+  type        = map(string)
+}
+
+###########
+# Function
+###########
+
 variable "handler" {
   description = "A handler name for your Lambda"
   type        = string
@@ -72,10 +81,23 @@ variable "timeout" {
   type        = number
 }
 
+variable "environment_variables" {
+  description = "Environment variables for stage"
+  type        = map
+}
+
+###########
+# Go related
+###########
+
 variable "dist_path" {
   description = "It's the dist path for compiled go."
   type        = string
 }
+
+###########
+# Policies
+###########
 
 variable "attach_policies" {
   description = "Controls whether list of policies should be added to IAM role for Lambda Function"
@@ -102,14 +124,13 @@ variable "policy_statements" {
   type        = map
 }
 
-variable "environment_variables" {
-  description = "Environment variables for stage"
-  type        = map
-}
+#############################
+# Lambda Event Source Mapping
+#############################
 
-variable "tags" {
-  description = "Tags to apply to the keys."
-  type        = map(string)
+variable "event_source_mapping" {
+  description = "Map of event source mapping"
+  type        = map
 }
 
 locals {

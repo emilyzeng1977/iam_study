@@ -53,9 +53,6 @@ inputs = {
   number_of_policies = 1
   policies = ["arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"]
 
-  timeout       = 120
-  tracing_mode  = "Active"
-
   # Inline policies
   attach_policy_statements = true
   policy_statements = {
@@ -70,6 +67,9 @@ inputs = {
       resources = [local.KMS_ARN]
     }
   }
+
+  timeout       = 120
+  tracing_mode  = "Active"
 
   tags = {
     "Managed By" = "Terragrunt"
