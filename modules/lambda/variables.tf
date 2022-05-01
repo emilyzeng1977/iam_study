@@ -126,10 +126,16 @@ locals {
 
   # Otel
   sdk_layer_arns_amd64 = format("arn:aws:lambda:%s:901920570463:layer:aws-otel-collector-amd64-ver-0-45-0:2", var.aws_region)
-
   environment_variables = merge(var.environment_variables, {
     log_level = var.log_level
     AWS_LAMBDA_EXEC_WRAPPER = "/opt/otel-instrument"
     OPENTELEMETRY_COLLECTOR_CONFIG_FILE = "/var/task/otel-collector-config.yaml"
+  })
+  policy_statements = merge(var.policy_statements, {
+    xray = {
+      effect    = "Allow",
+      actions   = ["xray:PutTraceSegments", "xray:PutTelemetryRecords"],
+      resources = ["*"]
+    }
   })
 }
