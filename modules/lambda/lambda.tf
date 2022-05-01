@@ -43,7 +43,7 @@ module "lambda" {
 
   # inline policies
   attach_policy_statements = var.attach_policy_statements
-  policy_statements = var.policy_statements
+  policy_statements = local.policy_statements
 
   layers = compact([local.sdk_layer_arns_amd64])
   tracing_mode = var.tracing_mode
