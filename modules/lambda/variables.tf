@@ -77,30 +77,54 @@ variable "dist_path" {
   type        = string
 }
 
-variable "kms_key_val" {
-
+variable "attach_policies" {
+  description = "Controls whether list of policies should be added to IAM role for Lambda Function"
+  type        = bool
 }
 
-variable "dynamo_kms_key_val" {
-  description = "The last kms key value like (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)"
-  type        = string
+variable "number_of_policies" {
+  description = "Number of policies to attach to IAM role for Lambda Function"
+  type        = number
 }
 
-variable "kinesis_kms_key_val" {
-  description = "The last kms key value like (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)"
-  type        = string
-}
-
-variable "managed_policy_arns" {
-  description = "The AWS managed policy arn's list"
+variable "policies" {
+  description = "List of policy statements ARN to attach to Lambda Function role"
   type        = list(string)
+}
+
+variable "attach_policy_statements" {
+  description = "Controls whether policy_statements should be added to IAM role for Lambda Function"
+  type        = bool
 }
 
 variable "policy_statements" {
   description = "Map of dynamic policy statements to attach to Lambda Function role"
   type        = map
-  default     = {}
 }
+
+variable "environment_variables" {
+  description = "Environment variables for stage"
+  type        = map
+}
+
+#variable "kms_key_val" {
+#
+#}
+
+#variable "dynamo_kms_key_val" {
+#  description = "The last kms key value like (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)"
+#  type        = string
+#}
+#
+#variable "kinesis_kms_key_val" {
+#  description = "The last kms key value like (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)"
+#  type        = string
+#}
+#
+#variable "managed_policy_arns" {
+#  description = "The AWS managed policy arn's list"
+#  type        = list(string)
+#}
 
 variable "tags" {
   description = "Tags to apply to the keys."
@@ -123,7 +147,13 @@ locals {
   inline_policy_name = format("%s-%s-%s", var.service, var.stage, var.handler)
   inline_policy_tpl_filename = format("template/%s.tpl", var.handler)
 
-  KMS_KEY = format("arn:aws:kms:%s:%s:key/%s", var.aws_region, var.account_id, var.kms_key_val)
+#  KMS_KEY = format("arn:aws:kms:%s:%s:key/%s", var.aws_region, var.account_id, var.kms_key_val)
   # Otel
   sdk_layer_arns_amd64 = format("arn:aws:lambda:%s:901920570463:layer:aws-otel-collector-amd64-ver-0-45-0:2", var.aws_region)
+
+  environment_variables = merge(var.environment_variables, {
+    log_level = var.log_level
+    AWS_LAMBDA_EXEC_WRAPPER = "/opt/otel-instrument"
+    OPENTELEMETRY_COLLECTOR_CONFIG_FILE = "/var/task/otel-collector-config.yaml"
+  })
 }
