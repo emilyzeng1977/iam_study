@@ -107,25 +107,6 @@ variable "environment_variables" {
   type        = map
 }
 
-#variable "kms_key_val" {
-#
-#}
-
-#variable "dynamo_kms_key_val" {
-#  description = "The last kms key value like (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)"
-#  type        = string
-#}
-#
-#variable "kinesis_kms_key_val" {
-#  description = "The last kms key value like (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)"
-#  type        = string
-#}
-#
-#variable "managed_policy_arns" {
-#  description = "The AWS managed policy arn's list"
-#  type        = list(string)
-#}
-
 variable "tags" {
   description = "Tags to apply to the keys."
   type        = map(string)
@@ -136,18 +117,13 @@ locals {
   bucket_name     = format("lambdas-%s.identitii.com", var.account_id)
   # Lambda
   function_name    = format("%s-%s-%s", var.service, var.stage, var.handler)
-  cmd_check        = "make check"
   cmd_build        = "make build"
   cmd_cp_otel      = format("cp otel-collector-config.yaml %s", var.dist_path)
   cmd_cd_dist_path = format("cd %s", var.dist_path)
 
-  SSM_ARN      = format("arn:aws:ssm:%s:%s:parameter/%s/*", var.aws_region, var.account_id, var.stage)
-  # IAM
+  # IAM (we will use the same naming convention as the serverless framework)
   lambda_role_name = format("%s-%s-%s-%s-lambdaRole", var.service, var.stage, var.handler, var.aws_region)
-  inline_policy_name = format("%s-%s-%s", var.service, var.stage, var.handler)
-  inline_policy_tpl_filename = format("template/%s.tpl", var.handler)
 
-#  KMS_KEY = format("arn:aws:kms:%s:%s:key/%s", var.aws_region, var.account_id, var.kms_key_val)
   # Otel
   sdk_layer_arns_amd64 = format("arn:aws:lambda:%s:901920570463:layer:aws-otel-collector-amd64-ver-0-45-0:2", var.aws_region)
 

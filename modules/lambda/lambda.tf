@@ -32,14 +32,6 @@ module "lambda" {
     }
   ]
 
-#  environment_variables = {
-#    ENV_STAGE = var.stage
-#    ENV_REGION = var.aws_region
-#    EVENT_TABLE_NAME = "events"
-#    SSM_ARN = local.SSM_ARN
-
-#    HONEYCOMB_API_KEY = data.aws_ssm_parameter.honeycomb_api_key.value
-#  }
   environment_variables = local.environment_variables
 
   create_role = true

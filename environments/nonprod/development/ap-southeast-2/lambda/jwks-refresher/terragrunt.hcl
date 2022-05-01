@@ -10,27 +10,59 @@ locals {
   account_vars = read_terragrunt_config(find_in_parent_folders("account.hcl"))
   region_vars = read_terragrunt_config(find_in_parent_folders("region.hcl"))
   env_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-}
 
-inputs = {
-  handler       = "jwks-refresher"
-  description   = "Jwks refresher service"
-  runtime       = "go1.x"
-  dist_path     = "dist/jwks-refresher_linux_amd64",
-
+  account_id  = local.account_vars.locals.aws_account_id
+  aws_region = local.region_vars.locals.aws_region
   service   = local.env_vars.locals.SERVICE
   stage   = local.env_vars.locals.SLS_STAGE
   vpc_security_group_id = local.env_vars.locals.VPC_SECURITY_GROUP_ID
   vpc_subnet_id = local.env_vars.locals.VPC_SUBNET_ID
-  kms_key_val = local.env_vars.locals.KMS_KEY_VAL
-  aws_region = local.region_vars.locals.aws_region
-  account_id  = local.account_vars.locals.aws_account_id
+
+  SSM_ARN = format("arn:aws:ssm:%s:%s:parameter/%s/*", local.aws_region, local.account_id, local.stage)
+  KINESIS_ARN = format("arn:aws:kinesis:%s:%s:stream/eventstream", local.aws_region, local.account_id)
+}
+
+inputs = {
+  # Fundamental information
+  handler       = "jwks-refresher"
+  description   = "jwks-refresher service"
+  runtime       = "go1.x"
+  dist_path     = "dist/jwks-refresher_linux_amd64",
+
+  # Environment variables
+  environment_variables = {
+    ENV_STAGE = local.stage
+    ENV_REGION = local.aws_region
+    EVENT_TABLE_NAME = "events"
+    SSM_ARN = local.SSM_ARN
+    KINESIS_ARN =  local.KINESIS_ARN
+  }
+
+  service   = local.service
+  stage   = local.stage
+  aws_region = local.aws_region
+  account_id  = local.account_id
+
+  # Setup subnet and security group (so need to give lambda permission accordingly)
+  vpc_security_group_id = local.vpc_security_group_id
+  vpc_subnet_id = local.vpc_subnet_id
+
+  attach_policies = true
+  number_of_policies = 1
+  policies = ["arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"]
 
   timeout       = 120
   tracing_mode  = "Active"
 
-  # we will need AWSLambdaVPCAccessExecutionRole when vpc_subnet_id is not empty
-  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"]
+  # Inline policies
+  attach_policy_statements = true
+  policy_statements = {
+    cognito = {
+      effect    = "Allow",
+      actions   = ["cognito-idp:ListUserPools"],
+      resources = ["*"]
+    }
+  }
 
   tags = {
     "Managed By" = "Terragrunt"

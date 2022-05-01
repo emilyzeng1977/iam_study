@@ -1,3 +1,49 @@
+image: asia.gcr.io/identitii-lab/platform-builder:2022-03-31-b8109b4
+
+variables:
+  REPO_NAME: lab.identitii.com/platform/iam
+
+stages:
+  - build
+  - test
+  - deploy
+
+# Caches the go mod dependencies throughout the build process
+.go-cache:
+  variables:
+    GOPATH: $CI_PROJECT_DIR/.go
+  before_script:
+    - mkdir -p .go
+    - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@lab.identitii.com".insteadOf "https://lab.identitii.com"
+  cache:
+    key: go-cache
+    paths:
+      - .go/pkg/mod/
+
+build:
+  stage: build
+  extends: .go-cache
+  script:
+    # lint
+    - make lint
+
+    # codegen check
+    - make codegen
+    - make dirty-check
+
+    # unit test
+    - make test
+
+    # build
+    - make build
+  cache:
+    - key: "build-cache:$CI_COMMIT_SHORT_SHA"
+      paths:
+        - dist/
+    - key: go-cache
+      paths:
+        - .go/pkg/mod/
+
 deploy-dev:
   stage: deploy
   extends: .go-cache
