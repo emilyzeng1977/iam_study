@@ -83,8 +83,12 @@ inputs = {
 
   event_source_mapping = {
     kinesis = {
-      event_source_arn  = local.KINESIS_ARN
+      event_source_arn = local.KINESIS_ARN
+      batch_size = 50
       starting_position = "TRIM_HORIZON"
+      maximum_retry_attempts = 5
+      bisect_batch_on_function_error = true
+      enabled = true
       filter_criteria   = {
         pattern = jsonencode({
           data : {
