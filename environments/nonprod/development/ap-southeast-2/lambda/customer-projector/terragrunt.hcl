@@ -84,12 +84,14 @@ inputs = {
   event_source_mapping = {
     kinesis = {
       event_source_arn  = local.KINESIS_ARN
-      starting_position = "LATEST"
+      starting_position = "TRIM_HORIZON"
       filter_criteria   = {
         pattern = jsonencode({
           data : {
-            Temperature : [{ numeric : [">", 0, "<=", 100] }]
-            Location : ["Oslo"]
+            type: [
+              "identitii.iam.customer.v1alpha1.Created",
+              "identitii.iam.customer.v1alpha1.Updated"
+            ]
           }
         })
       }

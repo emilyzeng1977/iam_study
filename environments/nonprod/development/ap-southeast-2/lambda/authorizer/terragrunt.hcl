@@ -64,6 +64,8 @@ inputs = {
   timeout       = 120
   tracing_mode  = "Active"
 
+  event_source_mapping = {}
+
   tags = {
     "Managed By" = "Terragrunt"
   }
