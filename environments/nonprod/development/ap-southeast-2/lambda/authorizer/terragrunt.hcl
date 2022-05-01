@@ -55,8 +55,8 @@ inputs = {
   attach_policy_statements = true
   policy_statements = {
     ssm = {
-      effect    = "Allow",
-      actions   = ["ssm:GetParameters"],
+      effect    = "Allow"
+      actions   = ["ssm:GetParameters"]
       resources = [local.SSM_ARN]
     }
   }

@@ -57,19 +57,44 @@ inputs = {
   attach_policy_statements = true
   policy_statements = {
     ssm = {
-      effect    = "Allow",
-      actions   = ["ssm:GetParameters"],
+      effect    = "Allow"
+      actions   = ["ssm:GetParameters"]
       resources = [local.SSM_ARN]
     },
     kms = {
-      effect    = "Allow",
-      actions   = ["kms:Decrypt"],
+      effect    = "Allow"
+      actions   = ["kms:Decrypt"]
       resources = [local.KMS_ARN]
+    },
+    kinesis = {
+      effect    = "Allow"
+      actions   = [
+        "kinesis:GetRecords",
+        "kinesis:GetShardIterator",
+        "kinesis:DescribeStream",
+        "kinesis:ListStreams"
+      ],
+      resources = [local.KINESIS_ARN]
     }
   }
 
   timeout       = 120
   tracing_mode  = "Active"
+
+  event_source_mapping = {
+    kinesis = {
+      event_source_arn  = local.KINESIS_ARN
+      starting_position = "LATEST"
+      filter_criteria   = {
+        pattern = jsonencode({
+          data : {
+            Temperature : [{ numeric : [">", 0, "<=", 100] }]
+            Location : ["Oslo"]
+          }
+        })
+      }
+    }
+  }
 
   tags = {
     "Managed By" = "Terragrunt"

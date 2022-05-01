@@ -55,8 +55,8 @@ inputs = {
   attach_policy_statements = true
   policy_statements = {
     cognito = {
-      effect    = "Allow",
-      actions   = ["cognito-idp:ListUserPools"],
+      effect    = "Allow"
+      actions   = ["cognito-idp:ListUserPools"]
       resources = ["*"]
     }
   }
