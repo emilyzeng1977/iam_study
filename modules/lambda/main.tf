@@ -58,5 +58,39 @@ module "lambda" {
   ###########
   event_source_mapping = var.event_source_mapping
 
+  allowed_triggers = {
+    ScanAmiRule = {
+      principal  = "events.amazonaws.com"
+      source_arn = module.eventbridge.eventbridge_rule_arns["crons"]
+    }
+  }
+
+  tags = var.tags
+
+  depends_on = [module.eventbridge]
+}
+
+module "eventbridge" {
+  source = "terraform-aws-modules/eventbridge/aws"
+  version = "1.14.0"
+
+  create_bus = false
+
+  rules = {
+    crons = {
+      description         = "Trigger for a Lambda"
+      schedule_expression = "rate(5 minutes)"
+    }
+  }
+
+  targets = {
+    crons = [
+      {
+        name  = "lambda-cron"
+        arn   = local.lambda_arn
+      }
+    ]
+  }
+
   tags = var.tags
 }

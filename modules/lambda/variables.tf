@@ -63,11 +63,13 @@ variable "log_level" {
 variable "vpc_subnet_id" {
   description = "Subnet id when Lambda Function should run in the VPC. Usually private or intra subnets."
   type        = string
+  default     = ""
 }
 
 variable "vpc_security_group_id" {
   description = "Security group ids when Lambda Function should run in the VPC"
   type        = string
+  default     = ""
 }
 
 variable "memory_size" {
@@ -133,6 +135,8 @@ variable "event_source_mapping" {
   type        = map
 }
 
+
+
 locals {
   # Bucket_name used to save lambda zip file
   bucket_name     = format("lambdas-%s.identitii.com", var.account_id)
@@ -143,7 +147,7 @@ locals {
   cmd_cd_dist_path = format("cd %s", var.dist_path)
 
   # IAM (we will use the same naming convention as the serverless framework)
-  lambda_role_name = format("%s-%s-%s-%s-lambdaRole", var.service, var.stage, var.handler, var.aws_region)
+  lambda_role_name = format("%s-%s-%s-%s-lambdaRole123", var.service, var.stage, var.handler, var.aws_region)
 
   # Otel
   sdk_layer_arns_amd64 = format("arn:aws:lambda:%s:901920570463:layer:aws-otel-collector-amd64-ver-0-45-0:2", var.aws_region)
@@ -159,4 +163,7 @@ locals {
       resources = ["*"]
     }
   })
+
+  # Schedule task
+  lambda_arn = format("arn:aws:lambda:%s:%s:function:%s", var.aws_region, var.account_id, local.function_name)
 }
