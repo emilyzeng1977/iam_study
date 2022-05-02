@@ -3,7 +3,6 @@ module "step_function" {
   version = "2.7.0"
 
   name       = local.step_function_name
-#  definition = data.template_file.new-customer-defination.rendered
   definition = var.definition
 
   use_existing_role = true
@@ -12,17 +11,7 @@ module "step_function" {
   type = "STANDARD"
   tags = var.tags
 
-  depends_on = [data.template_file.new-customer-defination, data.aws_iam_role.NewCustomerProvisioningFlowRole]
-}
-
-data "template_file" "new-customer-defination" {
-  template = file("template/create-customer-defination.tpl")
-
-  vars = {
-    aws_region    = var.aws_region
-    account_id    = var.account_id
-    function_name = local.function_name
-  }
+  depends_on = [data.aws_iam_role.NewCustomerProvisioningFlowRole]
 }
 
 data "aws_iam_role" "NewCustomerProvisioningFlowRole" {
