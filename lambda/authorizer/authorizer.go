@@ -10,8 +10,6 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/aws/aws-sdk-go/aws/session"
-    "github.com/aws/aws-sdk-go/service/ec2"
 )
 
 type SampleEvent struct {
@@ -21,21 +19,22 @@ type SampleEvent struct {
 }
 
 func HandleRequest(ctx context.Context, event SampleEvent) (string, error) {
-    // Load session from shared config
-    sess := session.Must(session.NewSessionWithOptions(session.Options{
-        SharedConfigState: session.SharedConfigEnable,
-    }))
-
-    // Create new EC2 client
-    ec2Svc := ec2.New(sess)
-
-    // Call to get detailed information on each instance
-    result, err := ec2Svc.DescribeInstances(nil)
-    if err != nil {
-        fmt.Println("EC2 Error", err)
-    } else {
-        fmt.Println("EC2 Success", result)
-    }
+	// Load session from shared config
+	//sess := session.Must(session.NewSessionWithOptions(session.Options{
+	//    SharedConfigState: session.SharedConfigEnable,
+	//}))
+	//
+	//// Create new EC2 client
+	//ec2Svc := ec2.New(sess)
+	//
+	//// Call to get detailed information on each instance
+	//result, err := ec2Svc.DescribeInstances(nil)
+	//if err != nil {
+	//    fmt.Println("EC2 Error", err)
+	//} else {
+	//    fmt.Println("EC2 Success", result)
+	//}
+	fmt.Println("Lambda Success")
 
 	return fmt.Sprintf("%+v", event), nil
 }
