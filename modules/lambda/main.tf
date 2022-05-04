@@ -40,10 +40,12 @@ module "lambda" {
   create_role = true
   role_name = local.lambda_role_name
 
+  # Pre-defined policies (ARN)
   attach_policies = var.attach_policies
   number_of_policies = var.number_of_policies
   policies = var.policies
 
+  # Inline policies
   attach_policy_statements = var.attach_policy_statements
   policy_statements = local.policy_statements
 
@@ -53,44 +55,57 @@ module "lambda" {
   layers = compact([local.sdk_layer_arns_amd64])
   tracing_mode = var.tracing_mode
 
-  ###########
+  #######
   # Event
-  ###########
+  #######
   event_source_mapping = var.event_source_mapping
 
-  allowed_triggers = {
-    ScanAmiRule = {
-      principal  = "events.amazonaws.com"
-      source_arn = module.eventbridge.eventbridge_rule_arns["crons"]
-    }
-  }
+
+  #############
+  # EventBridge
+  #############
+  allowed_triggers = local.allowed_triggers
 
   tags = var.tags
 
   depends_on = [module.eventbridge]
 }
 
+#############
+# EventBridge
+#############
+
 module "eventbridge" {
   source = "terraform-aws-modules/eventbridge/aws"
   version = "1.14.0"
 
+  count = length(var.schedules) > 0 ? 1 : 0
+
+  role_name = format("eventbridge_%d", 1)
   create_bus = false
 
-  rules = {
-    crons = {
-      description         = "Trigger for a Lambda"
-      schedule_expression = "rate(5 minutes)"
-    }
-  }
-
-  targets = {
-    crons = [
-      {
-        name  = "lambda-cron"
-        arn   = local.lambda_arn
-      }
-    ]
-  }
+  rules = local.rules
+  targets = local.targets
 
   tags = var.tags
+}
+
+output "schedules" {
+  value = var.schedules
+}
+
+output "rule_list" {
+  value = local.rule_list
+}
+
+output "allowed_triggers" {
+  value = local.allowed_triggers
+}
+
+output "rules" {
+  value = local.rules
+}
+
+output "targets" {
+  value = local.targets
 }

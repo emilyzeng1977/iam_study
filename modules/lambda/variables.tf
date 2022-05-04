@@ -135,7 +135,15 @@ variable "event_source_mapping" {
   type        = map
 }
 
+##############################################
+# Lambda EventBridge (Schedule) Source Mapping
+##############################################
 
+variable "schedules" {
+  description = "schedule expression list"
+  type        = list(string)
+  default     = []
+}
 
 locals {
   # Bucket_name used to save lambda zip file
@@ -164,6 +172,40 @@ locals {
     }
   })
 
+  #############################
+  # EventBridge (Schedule task)
+  #############################
   # Schedule task
   lambda_arn = format("arn:aws:lambda:%s:%s:function:%s", var.aws_region, var.account_id, local.function_name)
+
+  # Create rule list
+  rule_list = [
+    for schedule in var.schedules : replace(schedule, "/\\W/", "")
+  ]
+
+  # Create map of allowed_triggers for Lambda
+  allowed_triggers = {
+    for rule in local.rule_list : format("ScanAmi%s", rule) => {
+      principal  = "events.amazonaws.com"
+      source_arn = format("arn:aws:events:%s:%s:rule/%s-rule", var.aws_region, var.account_id, rule)
+    }
+  }
+
+  # Create map of rules for EventBridge
+  rules = {
+    for schedule in var.schedules : replace(schedule, "/\\W/", "") => {
+      description         = "Trigger for a Lambda"
+      schedule_expression = schedule
+    }
+  }
+
+  # Create map of targets for EventBridge
+  targets = {
+    for rule in local.rule_list : rule => [
+      {
+        name = rule
+        arn  = local.lambda_arn
+      }
+    ]
+  }
 }
