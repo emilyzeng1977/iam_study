@@ -101,6 +101,7 @@ variable "dist_path" {
 # Policies
 ###########
 
+# Predefined policies
 variable "attach_policies" {
   description = "Controls whether list of policies should be added to IAM role for Lambda Function"
   type        = bool
@@ -116,6 +117,7 @@ variable "policies" {
   type        = list(string)
 }
 
+# Inline policies
 variable "attach_policy_statements" {
   description = "Controls whether policy_statements should be added to IAM role for Lambda Function"
   type        = bool

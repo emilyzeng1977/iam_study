@@ -43,10 +43,27 @@ inputs = {
   # Inline policies
   attach_policy_statements = true
   policy_statements = {
-    ssm = {
+    cognito-idp-all = {
       effect    = "Allow"
-      actions   = ["ssm:GetParameters"]
+      actions   = [
+        "cognito-idp:CreateUserPool",
+        "cognito-idp:DeleteUserPool"
+      ]
       resources = ["*"]
+    }
+    cognito-idp = {
+      effect    = "Allow"
+      actions   = [
+        "cognito-idp:CreateUserPoolClient",
+        "cognito-idp:CreateUserPoolDomain",
+        "cognito-idp:DeleteUserPoolClient"
+      ]
+      resources = ["arn:aws:cognito-idp:ap-southeast-2:211817836436:userpool/*"]
+    }
+    lambda = {
+      effect    = "Allow"
+      actions   = ["lambda:InvokeFunction"]
+      resources = ["arn:aws:lambda:ap-southeast-2:211817836436:function:iam-*"]
     }
   }
 
