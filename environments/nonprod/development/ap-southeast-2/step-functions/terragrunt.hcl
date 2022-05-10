@@ -7,6 +7,8 @@ terraform {
 }
 
 locals {
+  handler = "create-customer"
+
   account_vars = read_terragrunt_config(find_in_parent_folders("account.hcl"))
   region_vars = read_terragrunt_config(find_in_parent_folders("region.hcl"))
   env_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
@@ -20,10 +22,9 @@ locals {
 }
 
 inputs = {
-  step_function_prefix = "NewCustomerProvisioningFlowStepFunctionsStateMachine"
-  handler = "create-customer"
+  step_function_suffix = format("%sStepFunctionsStateMachine", local.handler)
+  handler = local.handler
 
-  random_id  = "BS3iErQGyl1y"
   service    = local.service
   stage   = local.stage
   account_id = local.account_id
@@ -33,6 +34,21 @@ inputs = {
     account_id = local.account_id,
     function_name = format("%s-%s-%s", local.service, local.stage, "create-customer")
   })
+
+  # Predefined polices
+  attach_policies = true
+  number_of_policies = 1
+  policies = ["arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"]
+
+  # Inline policies
+  attach_policy_statements = true
+  policy_statements = {
+    ssm = {
+      effect    = "Allow"
+      actions   = ["ssm:GetParameters"]
+      resources = ["*"]
+    }
+  }
 
   tags = {
     "Managed By" = "Terragrunt"
